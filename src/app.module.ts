@@ -23,6 +23,7 @@ import { HelpersModule } from './helpers/helpers.module';
         database: configService.get('POSTGRES_DB'),
         entities: [__dirname + '/**/*.entity{.js, .ts}'],
         synchronize: true,
+        connectionTimeout: 30000,
       }),
       inject: [ConfigService],
     }),

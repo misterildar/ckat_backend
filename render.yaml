@@ -1,0 +1,9 @@
+services:
+  backend:
+    type: docker
+    dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3000:3000
+    entrypoint: ['pm2-runtime', 'start', 'ecosystem.config.js']
