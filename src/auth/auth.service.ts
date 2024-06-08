@@ -1,6 +1,10 @@
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
@@ -13,7 +17,7 @@ export class AuthService {
     private userService: UsersService,
     private jwtService: JwtService,
     private helpersService: HelpersService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   async registration(createUserDto: CreateUserDto) {
@@ -36,12 +40,12 @@ export class AuthService {
 
       const user = await this.userService.getUserById(payload.sub);
       if (!user) {
-        throw new UnauthorizedException('Пользователь не найден');
+        throw new ForbiddenException('Пользователь не найден');
       }
 
       const accessToken = this.jwtService.sign(
         { sub: user.id },
-        { expiresIn: '30d' },
+        { expiresIn: '30d' }
       );
       const newRefreshToken = this.generateRefreshToken({ sub: user.id });
 
@@ -56,10 +60,13 @@ export class AuthService {
 
   async validateUser(username: string, password: string) {
     const user = await this.userService.getUserByName(username);
+    if (!user) {
+      throw new ForbiddenException('Пользователь не найден');
+    }
 
     const passwordIdMatch = await this.helpersService.verifyPassword(
       user.password,
-      password,
+      password
     );
     if (user && passwordIdMatch) {
       return {
